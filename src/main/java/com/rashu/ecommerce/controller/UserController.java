@@ -3,10 +3,8 @@ package com.rashu.ecommerce.controller;
 import com.rashu.ecommerce.entity.UserEntity;
 import com.rashu.ecommerce.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,6 +15,14 @@ public class UserController {
     @GetMapping("/user-info")
     public List<UserEntity> getAllUsers(){
        return userService.fetchAllUsers();
+    }
+    @GetMapping("/user-info/{id}")
+    public ResponseEntity<UserEntity> getUser(@PathVariable Long id){
+        UserEntity user = userService.fetchUser(id);
+        if (user == null){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(userService.fetchUser(id));
     }
     @PostMapping("/add-info")
     public void addUsers(@RequestBody UserEntity userEntity){
