@@ -27,7 +27,11 @@ public class UserService  {
         if(userRepo.existsById(id)){
             UserEntity existingUserEntity = userRepo.findById(id).
                     orElseThrow(()-> new RuntimeException("the id entered is not found"));
-            existingUserEntity.setName(updatedName.getName());
+            existingUserEntity.setFirstname(updatedName.getFirstname());
+            existingUserEntity.setLastname(updatedName.getLastname());
+            existingUserEntity.setPhoneNo(updatedName.getPhoneNo());
+            existingUserEntity.setEmail(updatedName.getEmail());
+            existingUserEntity.setAddress(updatedName.getAddress());
             userRepo.save(existingUserEntity);
         }
     }
