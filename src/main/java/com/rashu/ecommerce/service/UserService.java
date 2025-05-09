@@ -6,19 +6,33 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+
 @Service
 @RequiredArgsConstructor
-public  class UserService  {
+public class UserService  {
     private final UserRepo userRepo;
 
     public List<UserEntity> fetchAllUsers() {
         return userRepo.findAll();
     }
-    public UserEntity fetchUser(Long id){
+   public UserEntity fetchUser(Long id){
         return userRepo.findById(id).orElse(null);
-    }
+   }
     public String createUsers(UserEntity userEntity) {
         userRepo.save(userEntity);
         return "Users added successfully";
+    }
+    public void updateUser(Long id, UserEntity updatedName){
+        if(userRepo.existsById(id)){
+            UserEntity existingUserEntity = userRepo.findById(id).
+                    orElseThrow(()-> new RuntimeException("the id entered is not found"));
+            existingUserEntity.setFirstname(updatedName.getFirstname());
+            existingUserEntity.setLastname(updatedName.getLastname());
+            existingUserEntity.setPhoneNo(updatedName.getPhoneNo());
+            existingUserEntity.setEmail(updatedName.getEmail());
+            existingUserEntity.setAddress(updatedName.getAddress());
+            userRepo.save(existingUserEntity);
+        }
     }
 }

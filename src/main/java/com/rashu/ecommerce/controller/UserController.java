@@ -11,7 +11,8 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+@RequestMapping("/api")
+public class    UserController {
     private final UserService userService;
     @GetMapping("/user-info")
     public  ResponseEntity<List<UserEntity>> getAllUsers(){
@@ -19,15 +20,21 @@ public class UserController {
     }
     @GetMapping("/user-info/{id}")
     public ResponseEntity<UserEntity> getUser(@PathVariable Long id){
-        UserEntity user = userService.fetchUser(id);
+      UserEntity user = userService.fetchUser(id);
         if (user == null){
             return new ResponseEntity<>(userService.fetchUser(id), HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(userService.fetchUser(id));
+
     }
     @PostMapping("/add-info")
     public ResponseEntity<String> addUsers(@RequestBody UserEntity userEntity){
         userService.createUsers(userEntity);
         return ResponseEntity.ok("Added successfully");
+    }
+    @PutMapping("/updated-info/{id}")
+    public ResponseEntity<String> modifyUser(@PathVariable("id") Long id, @RequestBody UserEntity updatedName) {
+        userService.updateUser(id,updatedName);
+        return ResponseEntity.ok("Updated Successfully");
     }
 }
