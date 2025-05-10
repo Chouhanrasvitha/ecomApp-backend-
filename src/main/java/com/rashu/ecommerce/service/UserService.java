@@ -33,6 +33,15 @@ public class UserService  {
         userEntity.setLastname(userRequest.getLastname());
         userEntity.setPhoneNo(userRequest.getPhoneNo());
         userEntity.setEmail(userRequest.getEmail());
+        if (userEntity.getAddress() != null){
+            AddressDTO addressDTO = new AddressDTO();
+            addressDTO.setStreet(userEntity.getAddress().getStreet());
+            addressDTO.setCity(userEntity.getAddress().getCity());
+            addressDTO.setState(userEntity.getAddress().getState());
+            addressDTO.setZipCode(userEntity.getAddress().getZipCode());
+            addressDTO.setCountry(userEntity.getAddress().getCountry());
+            userRequest.setAddressDTO(addressDTO);
+        }
         userRepo.save(userEntity);
         return "Users added successfully";
     }
