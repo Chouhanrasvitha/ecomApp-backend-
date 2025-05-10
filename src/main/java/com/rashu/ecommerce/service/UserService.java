@@ -1,11 +1,15 @@
 package com.rashu.ecommerce.service;
 
+import com.rashu.ecommerce.dto.AddressDTO;
+import com.rashu.ecommerce.dto.UserRequest;
+import com.rashu.ecommerce.dto.UserResponse;
 import com.rashu.ecommerce.entity.UserEntity;
 import com.rashu.ecommerce.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -13,13 +17,22 @@ import java.util.List;
 public class UserService  {
     private final UserRepo userRepo;
 
-    public List<UserEntity> fetchAllUsers() {
-        return userRepo.findAll();
+    public List<UserResponse> fetchAllUsers() {
+        return userRepo.findAll().stream()
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
     }
-   public UserEntity fetchUser(Long id){
-        return userRepo.findById(id).orElse(null);
+   public UserResponse fetchUser(Long id){
+        return userRepo.findById(id)
+                .map(this::mapToUserResponse)
+                .orElse(null);
    }
-    public String createUsers(UserEntity userEntity) {
+    public String createUsers(UserRequest userRequest) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setFirstname(userRequest.getFirstname());
+        userEntity.setLastname(userRequest.getLastname());
+        userEntity.setPhoneNo(userRequest.getPhoneNo());
+        userEntity.setEmail(userRequest.getEmail());
         userRepo.save(userEntity);
         return "Users added successfully";
     }
@@ -34,5 +47,24 @@ public class UserService  {
             existingUserEntity.setAddress(updatedName.getAddress());
             userRepo.save(existingUserEntity);
         }
+    }
+    public UserResponse mapToUserResponse(UserEntity userEntity){
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(String.valueOf(userEntity.getId()));
+        userResponse.setFirstname(userEntity.getFirstname());
+        userResponse.setLastname(userEntity.getLastname());
+        userResponse.setEmail(userEntity.getEmail());
+        userResponse.setPhoneNo(userEntity.getPhoneNo());
+        userResponse.setRole(userEntity.getRole());
+        if (userEntity.getAddress() != null){
+            AddressDTO addressDTO = new AddressDTO();
+            addressDTO.setStreet(userEntity.getAddress().getStreet());
+            addressDTO.setCity(userEntity.getAddress().getCity());
+            addressDTO.setState(userEntity.getAddress().getState());
+            addressDTO.setZipCode(userEntity.getAddress().getZipCode());
+            addressDTO.setCountry(userEntity.getAddress().getCountry());
+            userResponse.setAddressDTO(addressDTO);
+        }
+        return userResponse;
     }
 }
