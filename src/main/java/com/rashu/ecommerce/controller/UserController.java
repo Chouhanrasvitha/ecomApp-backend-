@@ -2,7 +2,6 @@ package com.rashu.ecommerce.controller;
 
 import com.rashu.ecommerce.dto.UserRequest;
 import com.rashu.ecommerce.dto.UserResponse;
-import com.rashu.ecommerce.entity.UserEntity;
 import com.rashu.ecommerce.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,8 +34,8 @@ public class    UserController {
         return ResponseEntity.ok("Added successfully");
     }
     @PutMapping("/updated-info/{id}")
-    public ResponseEntity<String> modifyUser(@PathVariable("id") Long id, @RequestBody UserEntity updatedName) {
-        userService.updateUser(id,updatedName);
+    public ResponseEntity<String> modifyUser(@PathVariable("id") Long id, @RequestBody UserRequest updatedUserRequest) {
+        userService.updateUser(id,updatedUserRequest);
         return ResponseEntity.ok("Updated Successfully");
     }
 }
