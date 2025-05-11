@@ -14,11 +14,10 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService  {
+public class UserService{
     private final UserRepo userRepo;
 
     public List<UserResponse> fetchAllUsers() {
-        System.out.println(userRepo.findAll().stream().map(this::mapToUserResponse));
         return userRepo.findAll().stream()
                 .map(this::mapToUserResponse)
                 .collect(Collectors.toList());
@@ -30,7 +29,7 @@ public class UserService  {
    }
     public void createUsers(UserRequest userRequest) {
         UserEntity userEntity = new UserEntity();
-        updatedUser(userEntity,userRequest);
+        updatedRequestFromUser(userEntity,userRequest);
         userRepo.save(userEntity);
     }
 
@@ -38,7 +37,7 @@ public class UserService  {
         if(userRepo.existsById(id)){
             UserEntity existingUserEntity = userRepo.findById(id).
                     orElseThrow(()-> new RuntimeException("the id entered is not found"));
-            updatedUser(existingUserEntity,updatedUserRequest);
+            updatedRequestFromUser(existingUserEntity,updatedUserRequest);
             userRepo.save(existingUserEntity);
         }
     }
@@ -61,18 +60,19 @@ public class UserService  {
         }
         return userResponse;
     }
-    private void updatedUser(UserEntity userEntity, UserRequest userRequest) {
+    private void updatedRequestFromUser(UserEntity userEntity, UserRequest userRequest) {
         userEntity.setFirstname(userRequest.getFirstname());
         userEntity.setLastname(userRequest.getLastname());
         userEntity.setPhoneNo(userRequest.getPhoneNo());
         userEntity.setEmail(userRequest.getEmail());
         if (userRequest.getAddressDTO()!=null){
             Address address = new Address();
-            address.setStreet(userEntity.getAddress().getStreet());
-            address.setCity(userEntity.getAddress().getCity());
-            address.setState(userEntity.getAddress().getState());
-            address.setZipCode(userEntity.getAddress().getZipCode());
-            address.setCountry(userEntity.getAddress().getCountry());
+            address.setStreet(userRequest.getAddressDTO().getStreet());
+            address.setCity(userRequest.getAddressDTO().getCity());
+            address.setState(userRequest.getAddressDTO().getState());
+            address.setZipCode(userRequest.getAddressDTO().getZipCode());
+            address.setCountry(userRequest.getAddressDTO().getCountry());
+            userEntity.setAddress(address);
         }
     }
 }
