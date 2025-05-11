@@ -20,10 +20,19 @@ public class ProductService {
     public void createProduct(ProductEntity productEntity){
         productRepo.save(productEntity);
     }
-    public void updateProducts(Long id,ProductEntity productEntity){
+    public ProductEntity updateProducts(Long id,ProductEntity productEntity){
         if (id!= null){
-
+                ProductEntity existingProduct= new ProductEntity();
+                existingProduct.setId(productEntity.getId());
+                existingProduct.setName(productEntity.getName());
+                existingProduct.setDescription(productEntity.getDescription());
+                existingProduct.setPrice(productEntity.getPrice());
+                existingProduct.setStockQuantity(productEntity.getStockQuantity());
+                existingProduct.setCategory(productEntity.getCategory());
+                existingProduct.setImageUrl(productEntity.getImageUrl());
+                productRepo.save(existingProduct);
         }
+        return productEntity;
     }
     public void deleteProduct(){
 

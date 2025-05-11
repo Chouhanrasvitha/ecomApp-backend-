@@ -3,6 +3,7 @@ package com.rashu.ecommerce.controller;
 import com.rashu.ecommerce.entity.ProductEntity;
 import com.rashu.ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,9 +29,12 @@ public class ProductController {
             productService.createProduct(productEntity);
             return ResponseEntity.ok("created products successfully");
     }
-    @PutMapping("/updateProduct-info")
-    public void updateProduct(@PathVariable Long id, @RequestBody ProductEntity productEntity){
-
+    @PutMapping("/updateProduct-info/{id}")
+    public ResponseEntity<ProductEntity> updateProduct(@PathVariable Long id, @RequestBody ProductEntity productEntity){
+        if (id==null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+       return ResponseEntity.ok(productService.updateProducts(id,productEntity));
     }
     @DeleteMapping("/delete")
     public void deleteProduct(){
