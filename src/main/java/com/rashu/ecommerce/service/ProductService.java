@@ -22,8 +22,8 @@ public class ProductService {
     }
     public ProductEntity updateProducts(Long id,ProductEntity productEntity){
         if (id!= null){
-                ProductEntity existingProduct= new ProductEntity();
-                existingProduct.setId(productEntity.getId());
+                ProductEntity existingProduct= productRepo.findById(id)
+                        .orElseThrow(()-> new RuntimeException("Entered invalid id"));
                 existingProduct.setName(productEntity.getName());
                 existingProduct.setDescription(productEntity.getDescription());
                 existingProduct.setPrice(productEntity.getPrice());
@@ -34,7 +34,9 @@ public class ProductService {
         }
         return productEntity;
     }
-    public void deleteProduct(){
-
+    public void deleteProduct(Long id) {
+        if (id != null) {
+            productRepo.deleteById(id);
+        }
     }
 }
