@@ -22,11 +22,7 @@ public class    UserController {
     @GetMapping("/user-info/{id}")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id){
       UserResponse userResponse = userService.fetchUser(id);
-        if (userResponse == null){
-            return new ResponseEntity<>(userService.fetchUser(id), HttpStatus.NOT_FOUND);
-        }
         return ResponseEntity.ok(userResponse);
-
     }
     @PostMapping("/add-info")
     public ResponseEntity<String> addUsers(@RequestBody UserRequest userRequest){

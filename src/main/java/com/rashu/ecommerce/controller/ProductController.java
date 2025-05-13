@@ -1,6 +1,7 @@
 package com.rashu.ecommerce.controller;
 
-import com.rashu.ecommerce.entity.ProductEntity;
+import com.rashu.ecommerce.dto.ProductRequest;
+import com.rashu.ecommerce.dto.ProductResponse;
 import com.rashu.ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,26 +16,26 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
     @GetMapping("/product-info/{id}")
-    public ResponseEntity<ProductEntity> getProduct(@PathVariable Long id){
-        ProductEntity product = productService.fetchProduct(id);
-        return ResponseEntity.ok(product);
+    public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id){
+        ProductResponse productResponse= productService.fetchProduct(id);
+    return ResponseEntity.ok(productResponse);
     }
     @GetMapping("/product-info")
-    public ResponseEntity<List<ProductEntity>> getProducts(){
-        List<ProductEntity> productList = productService.fetchAllProducts();
-        return ResponseEntity.ok(productList);
+    public ResponseEntity<List<ProductResponse>> getProducts() {
+        List<ProductResponse> productResponse= productService.fetchAllProducts();
+        return ResponseEntity.ok(productResponse);
     }
     @PostMapping("/addProduct-info")
-    public ResponseEntity<String> addProducts(@RequestBody ProductEntity productEntity){
-            productService.createProduct(productEntity);
+    public ResponseEntity<String> addProducts(@RequestBody ProductRequest productRequest){
+            productService.createProduct(productRequest);
             return ResponseEntity.ok("created products successfully");
     }
     @PutMapping("/updateProduct-info/{id}")
-    public ResponseEntity<ProductEntity> updateProduct(@PathVariable Long id, @RequestBody ProductEntity productEntity){
+    public ResponseEntity<ProductRequest> updateProduct(@PathVariable Long id, @RequestBody ProductRequest productRequest){
         if (id==null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-       return ResponseEntity.ok(productService.updateProducts(id,productEntity));
+       return ResponseEntity.ok(productService.updateProducts(id,productRequest));
     }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id){
