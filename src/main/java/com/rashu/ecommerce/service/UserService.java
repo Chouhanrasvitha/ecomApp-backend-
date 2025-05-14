@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,61 +19,63 @@ public class UserService{
     private final UserRepo userRepo;
 
     public List<UserResponse> fetchAllUsers() {
-        return userRepo.findAll().stream()
-                .map(this::mapToUserResponse)
+        return userRepo.findAll()
+                .stream()
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-   public UserResponse fetchUser(Long id){
+    public UserResponse fetchUserById(Long id){
         return userRepo.findById(id)
-                .map(this::mapToUserResponse)
-                .orElse(null);
-   }
-    public void createUsers(UserRequest userRequest) {
-        UserEntity userEntity = new UserEntity();
-        updatedRequestFromUser(userEntity,userRequest);
-        userRepo.save(userEntity);
+                .map(this::mapToResponse)
+                .orElseThrow(()-> new RuntimeException("id entered is not found"));
     }
-
-    public void updateUser(Long id, UserRequest updatedUserRequest){
-        if(userRepo.existsById(id)){
-            UserEntity existingUserEntity = userRepo.findById(id).
-                    orElseThrow(()-> new RuntimeException("the id entered is not found"));
-            updatedRequestFromUser(existingUserEntity,updatedUserRequest);
-            userRepo.save(existingUserEntity);
+    public UserResponse createUsers(UserRequest userRequest){
+        UserEntity user = new UserEntity();
+        updateRequestToEntity(user,userRequest);
+        UserEntity savedUser = userRepo.save(user);
+        return mapToResponse(savedUser);
+    }
+    public Optional<UserResponse> updateUsers(Long id, UserRequest updateduserRequest) {
+        if (userRepo.existsById(id)) {
+            UserEntity existingUser = userRepo.findById(id).orElseThrow(() -> new RuntimeException(" id entered is not found"));
+            updateRequestToEntity(existingUser, updateduserRequest);
+            UserEntity savedUpdatedUserRequest = userRepo.save(existingUser);
+            return Optional.ofNullable(mapToResponse(savedUpdatedUserRequest));
         }
+        return null;
     }
-    public UserResponse mapToUserResponse(UserEntity userEntity){
-        UserResponse userResponse = new UserResponse();
-        userResponse.setId(String.valueOf(userEntity.getId()));
-        userResponse.setFirstname(userEntity.getFirstname());
-        userResponse.setLastname(userEntity.getLastname());
-        userResponse.setEmail(userEntity.getEmail());
-        userResponse.setPhoneNo(userEntity.getPhoneNo());
-        userResponse.setRole(userEntity.getRole());
-        if (userEntity.getAddress() != null){
-            AddressDTO addressDTO = new AddressDTO();
-            addressDTO.setStreet(userEntity.getAddress().getStreet());
-            addressDTO.setCity(userEntity.getAddress().getCity());
-            addressDTO.setState(userEntity.getAddress().getState());
-            addressDTO.setZipCode(userEntity.getAddress().getZipCode());
-            addressDTO.setCountry(userEntity.getAddress().getCountry());
-            userResponse.setAddressDTO(addressDTO);
-        }
-        return userResponse;
+    public UserResponse mapToResponse(UserEntity user) {
+        UserResponse response = new UserResponse();
+        response.setId(String.valueOf(user.getId()));
+        response.setFirstname(user.getFirstname());
+        response.setLastname(user.getLastname());
+        response.setEmail(user.getEmail());
+        response.setPhoneNo(user.getPhoneNo());
+        response.setRole(user.getRole());
+                if (user.getAddress()!=null){
+                    AddressDTO addressDTO = new AddressDTO();
+                    addressDTO.setStreet(user.getAddress().getStreet());
+                    addressDTO.setState(user.getAddress().getState());
+                    addressDTO.setCity(user.getAddress().getCity());
+                    addressDTO.setCountry(user.getAddress().getCountry());
+                    addressDTO.setZipCode(user.getAddress().getZipCode());
+                    response.setAddressDTO(addressDTO);
+                }
+                return response;
     }
-    private void updatedRequestFromUser(UserEntity userEntity, UserRequest userRequest) {
-        userEntity.setFirstname(userRequest.getFirstname());
-        userEntity.setLastname(userRequest.getLastname());
-        userEntity.setPhoneNo(userRequest.getPhoneNo());
-        userEntity.setEmail(userRequest.getEmail());
+    public   void updateRequestToEntity(UserEntity user, UserRequest userRequest) {
+        user.setFirstname(userRequest.getFirstname());
+        user.setLastname(userRequest.getLastname());
+        user.setEmail(userRequest.getEmail());
+        user.setPhoneNo(userRequest.getPhoneNo());
         if (userRequest.getAddressDTO()!=null){
             Address address = new Address();
             address.setStreet(userRequest.getAddressDTO().getStreet());
-            address.setCity(userRequest.getAddressDTO().getCity());
             address.setState(userRequest.getAddressDTO().getState());
-            address.setZipCode(userRequest.getAddressDTO().getZipCode());
+            address.setCity(userRequest.getAddressDTO().getCity());
             address.setCountry(userRequest.getAddressDTO().getCountry());
-            userEntity.setAddress(address);
+            address.setZipCode(userRequest.getAddressDTO().getZipCode());
+            user.setAddress(address);
         }
     }
 }
