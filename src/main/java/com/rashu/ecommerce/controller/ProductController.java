@@ -15,31 +15,33 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
-    @GetMapping("/product-info/{id}")
-    public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id){
-        ProductResponse productResponse= productService.fetchProduct(id);
-    return ResponseEntity.ok(productResponse);
-    }
+
+
     @GetMapping("/product-info")
-    public ResponseEntity<List<ProductResponse>> getProducts() {
-        List<ProductResponse> productResponse= productService.fetchAllProducts();
-        return ResponseEntity.ok(productResponse);
+    public ResponseEntity<List<ProductResponse>> getAllActiveProducts() {
+        return new ResponseEntity<>(productService.fetchActiveProducts(), HttpStatus.FOUND);
     }
+
+    @GetMapping("/product-info/search")
+    public ResponseEntity<List<ProductResponse>> getSearchProducts(@RequestParam("keyword") String keyword) {
+        return new ResponseEntity<>(productService.searchProducts(keyword), HttpStatus.FOUND);
+    }
+
     @PostMapping("/addProduct-info")
-    public ResponseEntity<String> addProducts(@RequestBody ProductRequest productRequest){
-            productService.createProduct(productRequest);
-            return ResponseEntity.ok("created products successfully");
+    public ResponseEntity<ProductResponse> addProducts(@RequestBody ProductRequest productRequest) {
+        return new ResponseEntity<>(productService.createProducts(productRequest), HttpStatus.CREATED);
     }
+
     @PutMapping("/updateProduct-info/{id}")
-    public ResponseEntity<ProductRequest> updateProduct(@PathVariable Long id, @RequestBody ProductRequest productRequest){
-        if (id==null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-       return ResponseEntity.ok(productService.updateProducts(id,productRequest));
+    public ResponseEntity<ProductResponse> modifiedProducts(@PathVariable Long id, @RequestBody ProductRequest productRequest) {
+        ProductResponse productResponse = productService.updateProducts(id, productRequest);
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
+
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id){
-        productService.deleteProduct(id);
-        return ResponseEntity.ok("deleted successfully");
+    public ResponseEntity<String > removeProducts(@PathVariable Long id) {
+       productService.deleteInactiveProducts(id);
+       return new ResponseEntity<>("product deleted successfully",HttpStatus.NO_CONTENT);
     }
 }
+

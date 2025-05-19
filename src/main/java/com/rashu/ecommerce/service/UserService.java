@@ -7,7 +7,9 @@ import com.rashu.ecommerce.entity.Address;
 import com.rashu.ecommerce.entity.UserEntity;
 import com.rashu.ecommerce.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,26 +46,26 @@ public class UserService{
         }
         return null;
     }
-    public UserResponse mapToResponse(UserEntity user) {
+    public UserResponse mapToResponse(UserEntity savedUser) {
         UserResponse response = new UserResponse();
-        response.setId(String.valueOf(user.getId()));
-        response.setFirstname(user.getFirstname());
-        response.setLastname(user.getLastname());
-        response.setEmail(user.getEmail());
-        response.setPhoneNo(user.getPhoneNo());
-        response.setRole(user.getRole());
-                if (user.getAddress()!=null){
-                    AddressDTO addressDTO = new AddressDTO();
-                    addressDTO.setStreet(user.getAddress().getStreet());
-                    addressDTO.setState(user.getAddress().getState());
-                    addressDTO.setCity(user.getAddress().getCity());
-                    addressDTO.setCountry(user.getAddress().getCountry());
-                    addressDTO.setZipCode(user.getAddress().getZipCode());
-                    response.setAddressDTO(addressDTO);
-                }
-                return response;
+        response.setId(String.valueOf(savedUser.getId()));
+        response.setFirstname(savedUser.getFirstname());
+        response.setLastname(savedUser.getLastname());
+        response.setEmail(savedUser.getEmail());
+        response.setPhoneNo(savedUser.getPhoneNo());
+        response.setRole(savedUser.getRole());
+        if (savedUser.getAddress() != null) {
+            AddressDTO addressDTO = new AddressDTO();
+            addressDTO.setStreet(savedUser.getAddress().getStreet());
+            addressDTO.setState(savedUser.getAddress().getState());
+            addressDTO.setCity(savedUser.getAddress().getCity());
+            addressDTO.setCountry(savedUser.getAddress().getCountry());
+            addressDTO.setZipCode(savedUser.getAddress().getZipCode());
+            response.setAddressDTO(addressDTO);
+        }
+        return response;
     }
-    public   void updateRequestToEntity(UserEntity user, UserRequest userRequest) {
+public   void updateRequestToEntity(UserEntity user, UserRequest userRequest) {
         user.setFirstname(userRequest.getFirstname());
         user.setLastname(userRequest.getLastname());
         user.setEmail(userRequest.getEmail());
@@ -77,5 +79,11 @@ public class UserService{
             address.setZipCode(userRequest.getAddressDTO().getZipCode());
             user.setAddress(address);
         }
+    }
+
+    public void deleteUserById(Long id) {
+        UserEntity existingUser = userRepo.findById(id).
+                orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
+        userRepo.delete(existingUser);
     }
 }
